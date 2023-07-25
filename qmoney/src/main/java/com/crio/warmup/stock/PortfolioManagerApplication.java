@@ -9,21 +9,35 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
-//import java.nio.file.Files;
 import java.nio.file.Paths;
-//import java.time.LocalDate;
-//import java.time.temporal.ChronoUnit;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
-//import java.util.Collections;
-//import java.util.Comparator;
+import java.util.Collections;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 import java.util.logging.Logger;
-//import java.util.stream.Collectors;
-//import java.util.stream.Stream;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.apache.logging.log4j.ThreadContext;
-//import org.springframework.web.client.RestTemplate;
+import org.springframework.web.client.RestTemplate;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
+import java.util.UUID;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import org.apache.logging.log4j.ThreadContext;
+import org.springframework.web.client.RestTemplate;
 
 
 public class PortfolioManagerApplication {
@@ -59,15 +73,79 @@ public class PortfolioManagerApplication {
    return symbolList;
   }
 
+  // Note:
+  // Remember to confirm that you are getting same results for annualized returns as in Module 3.
+  public static List<String> mainReadQuotes(String[] args) throws IOException, URISyntaxException {
+    List<PortfolioTrade> tradesFromJsonList=readTradesFromJson(args[0]);
+    String token="99601c555207476b4459e78e9f8338ddae96c21e";
+    List<TotalReturnsDto> totalReturnsDtos=fetchDataFromTiingo(tradesFromJsonList, args, token);
 
+     if(totalReturnsDtos.size()==0){
+      List<String> ans = Arrays.asList(new String[]{});
+      return ans;
+     }
+    Collections.sort(totalReturnsDtos,new MYComparator());
+    List<String> result=removeDuplicateSymbols(totalReturnsDtos);
+    
+     return result;
+  }
+  ///// fetchDataFromTiingo
+  public static List<TotalReturnsDto> fetchDataFromTiingo(List<PortfolioTrade> tradesFromJsonList,
+  String[] args, String token ){
+    List<TotalReturnsDto> totalReturnsDtos=new ArrayList<>();
+    RestTemplate restTemplate =new RestTemplate();
+    for(PortfolioTrade trade:tradesFromJsonList){
+          LocalDate endDate=LocalDate.parse(args[1]);
+        // If it is Not ValidDate
+      if(!isValidDates(trade.getPurchaseDate(), endDate))
+       throw new RuntimeException();
+
+         String url=prepareUrl(trade, endDate, token);
+         TiingoCandle tiingoCandleArray[]=restTemplate.getForObject(url,  TiingoCandle[].class);
+        
+         for(TiingoCandle tCandle:tiingoCandleArray){
+          totalReturnsDtos.add(new TotalReturnsDto(trade.getSymbol(), tCandle.getClose()));
+         }
+    }
+    return totalReturnsDtos;
+  }
+
+
+  //// is Valid Dates
+  public static boolean isValidDates(LocalDate startDate, LocalDate endDate){ 
+     if(startDate.isBefore(endDate))
+     return true;
+     else
+     return false;
+  }
+
+  ///// removeDuplicateSymbol
+   public static List<String> removeDuplicateSymbols(List<TotalReturnsDto> totalReturnsDtos){
+    HashSet<String> check=new HashSet();
+    List<String> result=new ArrayList<>();
+    if(totalReturnsDtos.size()!=0){
+    result.add(totalReturnsDtos.get(0).getSymbol());
+     check.add(totalReturnsDtos.get(0).getSymbol());
+    }
+
+     for(int i=1; i<totalReturnsDtos.size(); i++){
+      String s1=totalReturnsDtos.get(i-1).getSymbol();
+      String s2=totalReturnsDtos.get(i).getSymbol();
+      if(check.contains(s2))continue;
+       if(!s1.equals(s2)){
+        result.add(s2);
+        check.add(s2);
+       }
+     }
+     return result;
+   }
   // Note:
   // 1. You may need to copy relevant code from #mainReadQuotes to parse the Json.
   // 2. Remember to get the latest quotes from Tiingo API.
 
-
-
-
-
+  // TODO: CRIO_TASK_MODULE_REST_API
+  //  Find out the closing price of each stock on the end_date and return the list
+  //  of all symbols in ascending order by its close value on end date.
 
   // Note:
   // 1. You may have to register on Tiingo to get the api_token.
@@ -76,6 +154,26 @@ public class PortfolioManagerApplication {
   // 3. Use RestTemplate#getForObject in order to call the API,
   //    and deserialize the results in List<Candle>
 
+  // TODO:
+  //  After refactor, make sure that the tests pass by using these two commands
+  //  ./gradlew test --tests PortfolioManagerApplicationTest.readTradesFromJson
+  //  ./gradlew test --tests PortfolioManagerApplicationTest.mainReadFile
+  public static List<PortfolioTrade> readTradesFromJson(String filename) throws IOException, URISyntaxException {
+    ObjectMapper objMapper=getObjectMapper();
+    File file = resolveFileFromResources(filename);
+    List<PortfolioTrade> tradesFromJson = Arrays.asList(objMapper.readValue(file, PortfolioTrade[].class));
+    return tradesFromJson;
+ }
+
+
+ // TODO:
+ //  Build the Url using given parameters and use this function in your code to cann the API.
+ public static String prepareUrl(PortfolioTrade trade, LocalDate endDate, String token) {
+    
+  String url="https://api.tiingo.com/tiingo/daily/"+trade.getSymbol()+"/prices?startDate="+
+        trade.getPurchaseDate()+"&endDate="+ endDate+"&token="+token;
+    return url;
+  }
 
 
   private static void printJsonObject(Object object) throws IOException {
@@ -141,6 +239,32 @@ public class PortfolioManagerApplication {
 
   // Note:
   // Remember to confirm that you are getting same results for annualized returns as in Module 3.
+  // public static List<String> mainReadQuotes(String[] args) throws IOException, URISyntaxException {
+  //   System.out.println("---> "+Arrays.toString(args));
+  //    return Collections.emptyList();
+  // }
+
+  // TODO:
+  //  After refactor, make sure that the tests pass by using these two commands
+  //  ./gradlew test --tests PortfolioManagerApplicationTest.readTradesFromJson
+  //  ./gradlew test --tests PortfolioManagerApplicationTest.mainReadFile
+  // public static List<PortfolioTrade> readTradesFromJson(String filename) throws IOException, URISyntaxException {
+  //    return Collections.emptyList();
+  // }
+
+
+  // TODO:
+  //  Build the Url using given parameters and use this function in your code to cann the API.
+  // public static String prepareUrl(PortfolioTrade trade, LocalDate endDate, String token) {
+  //    return Collections.emptyList().toString();
+  // }
+
+
+
+
+
+
+
 
 
 
@@ -148,9 +272,23 @@ public class PortfolioManagerApplication {
     Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionHandler());
     ThreadContext.put("runId", UUID.randomUUID().toString());
 
-    printJsonObject(mainReadFile(args));
+   // printJsonObject(mainReadFile(args));
 
 
+    printJsonObject(mainReadQuotes(args));
+
+
+  }
+}
+
+class MYComparator implements Comparator{
+  @Override
+  public int compare(Object obj1, Object obj2){
+   TotalReturnsDto tdo1=(TotalReturnsDto)obj1;
+   TotalReturnsDto tdo2=(TotalReturnsDto)obj2;
+   Double d1=tdo1.getClosingPrice();
+   Double  d2=tdo2.getClosingPrice();
+   return d1.compareTo(d2);
 
   }
 }
