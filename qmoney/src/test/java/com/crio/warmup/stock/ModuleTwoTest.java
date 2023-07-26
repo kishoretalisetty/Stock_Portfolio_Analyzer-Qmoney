@@ -27,9 +27,11 @@ class ModuleTwoTest {
     //given
     String filename = "assessments/empty.json";
     List<String> expected = Arrays.asList(new String[]{});
+
     //when
     List<String> actual = PortfolioManagerApplication
         .mainReadQuotes(new String[]{filename, "2019-12-12"});
+
     //then
     Assertions.assertEquals(expected, actual);
   }
@@ -64,7 +66,7 @@ class ModuleTwoTest {
     //when
     List<String> actual = PortfolioManagerApplication
         .mainReadQuotes(new String[]{filename, "2019-12-12"});
-    
+
     //then
     Assertions.assertEquals(expected, actual);
   }
