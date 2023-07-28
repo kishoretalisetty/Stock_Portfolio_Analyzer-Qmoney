@@ -93,9 +93,10 @@ public class PortfolioManagerApplication {
       List<String> ans = Arrays.asList(new String[]{});
       return ans;
      }
+     
     Collections.sort(totalReturnsDtos,new MYComparator());
     List<String> result=removeDuplicateSymbols(totalReturnsDtos);
-    
+    //System.out.println(result);
      return result;
   }
   ///// fetchDataFromTiingo
