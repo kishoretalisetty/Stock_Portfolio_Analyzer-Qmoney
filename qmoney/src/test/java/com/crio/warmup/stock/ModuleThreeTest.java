@@ -4,7 +4,6 @@ package com.crio.warmup.stock;
 import com.crio.warmup.stock.dto.AnnualizedReturn;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -19,8 +18,7 @@ class ModuleThreeTest {
     //when
     List<AnnualizedReturn> result = PortfolioManagerApplication
         .mainCalculateSingleReturn(new String[]{filename, "2019-12-12"});
-    
-      //  System.out.println("--->"+result);
+
     //then
     List<String> symbols = result.stream().map(AnnualizedReturn::getSymbol)
         .collect(Collectors.toList());
@@ -83,7 +81,6 @@ class ModuleThreeTest {
     //then
     List<String> symbols = result.stream().map(AnnualizedReturn::getSymbol)
         .collect(Collectors.toList());
-
     Assertions.assertEquals(0.141, result.get(0).getAnnualizedReturn(), 0.01);
     Assertions.assertEquals(0.091, result.get(1).getAnnualizedReturn(), 0.01);
     Assertions.assertEquals(0.056, result.get(2).getAnnualizedReturn(), 0.01);
