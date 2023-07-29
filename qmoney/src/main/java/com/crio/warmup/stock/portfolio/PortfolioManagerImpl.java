@@ -140,4 +140,17 @@ public class PortfolioManagerImpl implements PortfolioManager {
   return false;
  }
 
+
+
+
+
+
+
+  // private Comparator<AnnualizedReturn> getComparator() {
+  //   return Comparator.comparing(AnnualizedReturn::getAnnualizedReturn).reversed();
+  // }
+
+
+
+
 }
