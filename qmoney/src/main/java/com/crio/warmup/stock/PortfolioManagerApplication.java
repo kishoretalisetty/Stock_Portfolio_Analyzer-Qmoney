@@ -46,8 +46,10 @@ import java.util.List;
 
 public class PortfolioManagerApplication {
      
-    private static String token="99601c555207476b4459e78e9f8338ddae96c21e";
+    // private static String token="99601c555207476b4459e78e9f8338ddae96c21e";
     
+    private static String token="076d21137d5269064524cd8effa18fbdcdd9d86a";
+
   // TODO: CRIO_TASK_MODULE_JSON_PARSING
   //  Task:
   //       - Read the json file provided in the argument[0], The file is available in the classpath.

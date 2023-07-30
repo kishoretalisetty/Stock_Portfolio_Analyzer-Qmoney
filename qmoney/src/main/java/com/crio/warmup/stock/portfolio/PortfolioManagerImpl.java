@@ -10,6 +10,7 @@ import com.crio.warmup.stock.dto.AnnualizedReturn;
 import com.crio.warmup.stock.dto.Candle;
 import com.crio.warmup.stock.dto.PortfolioTrade;
 import com.crio.warmup.stock.dto.TiingoCandle;
+import com.crio.warmup.stock.quotes.StockQuotesService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -32,15 +33,22 @@ public class PortfolioManagerImpl implements PortfolioManager {
 
   
 
-  private static String token="99601c555207476b4459e78e9f8338ddae96c21e";
+  private static String token="076d21137d5269064524cd8effa18fbdcdd9d86a";
    
   private RestTemplate restTemplate;
+
+  private StockQuotesService stockQuotesService;
 
   // Caution: Do not delete or modify the constructor, or else your build will break!
   // This is absolutely necessary for backward compatibility
   protected PortfolioManagerImpl(RestTemplate restTemplate) {
     this.restTemplate = restTemplate;
   }
+
+  protected PortfolioManagerImpl(StockQuotesService stockQuotesService) {
+    this.stockQuotesService = stockQuotesService;
+  }
+  
 
   //TODO: CRIO_TASK_MODULE_REFACTOR
   // 1. Now we want to convert our code into a module, so we will not call it from main anymore.
@@ -107,21 +115,34 @@ public class PortfolioManagerImpl implements PortfolioManager {
   throws JsonProcessingException {
 
     // LocalDate startDate=trade.getPurchaseDate();
-     if(!isValidDates(from, to))
-        throw new RuntimeException();
+    //  if(!isValidDates(from, to))
+    //     throw new RuntimeException();
  
-    // RestTemplate restTemplate=new RestTemplate();
-     //TiingoCandle start=null;
-     String url=buildUri(symbol, from,to);
-     TiingoCandle tiingoCandleArray[]=restTemplate.getForObject(url,  TiingoCandle[].class);
-      List<Candle> candlesList=Arrays.asList(tiingoCandleArray);
-      return candlesList;
+    // // RestTemplate restTemplate=new RestTemplate();
+    //  //TiingoCandle start=null;
+    //  String url=buildUri(symbol, from,to);
+    //  TiingoCandle tiingoCandleArray[]=restTemplate.getForObject(url,  TiingoCandle[].class);
+    //  if(tiingoCandleArray==null){
+    //   return new ArrayList<>();
+    //  } 
+   return  stockQuotesService.getStockQuote(symbol, from, to);
+    //  List<Candle> candlesList=Arrays.asList(tiingoCandleArray);
+      //return candlesList;
    }
+
   protected String buildUri(String symbol, LocalDate startDate, LocalDate endDate) {
        String uriTemplate = "https:api.tiingo.com/tiingo/daily/"+symbol+"/prices?"
             + "startDate="+startDate+"&endDate="+endDate+"&token="+token;
             return uriTemplate;
   }
+
+  
+  public  boolean isValidDates(LocalDate startDate, LocalDate endDate){ 
+    if(startDate.isBefore(endDate))
+    return true;
+    else
+    return false;
+   }
 
   public  Double getOpeningPriceOnStartDate(List<Candle> candles) {
 
@@ -133,12 +154,7 @@ public class PortfolioManagerImpl implements PortfolioManager {
     return candles.get(candles.size()-1).getClose();
   }
 
- public  boolean isValidDates(LocalDate startDate, LocalDate endDate){ 
-  if(startDate.isBefore(endDate))
-  return true;
-  else
-  return false;
- }
+ 
 
 
 
