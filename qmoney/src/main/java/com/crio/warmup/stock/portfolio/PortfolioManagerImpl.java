@@ -10,6 +10,7 @@ import com.crio.warmup.stock.dto.AnnualizedReturn;
 import com.crio.warmup.stock.dto.Candle;
 import com.crio.warmup.stock.dto.PortfolioTrade;
 import com.crio.warmup.stock.dto.TiingoCandle;
+import com.crio.warmup.stock.exception.StockQuoteServiceException;
 import com.crio.warmup.stock.quotes.StockQuotesService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -64,7 +65,7 @@ public class PortfolioManagerImpl implements PortfolioManager {
   //CHECKSTYLE:OFF
  
   public  List<AnnualizedReturn> calculateAnnualizedReturn(List<PortfolioTrade> tradesFromJsonList,
-      LocalDate endDate){
+      LocalDate endDate) throws StockQuoteServiceException{
         
         List<AnnualizedReturn> annualizedReturns=new ArrayList<>();
             
@@ -78,7 +79,8 @@ public class PortfolioManagerImpl implements PortfolioManager {
          annualizedReturns.add(ans);
           } catch (JsonProcessingException e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
+            throw new StockQuoteServiceException(e.getMessage());
+            
           }
         }
         Collections.sort(annualizedReturns,getComparator());
@@ -112,7 +114,7 @@ public class PortfolioManagerImpl implements PortfolioManager {
 
 
   public List<Candle> getStockQuote(String symbol, LocalDate from, LocalDate to)
-  throws JsonProcessingException {
+  throws JsonProcessingException, StockQuoteServiceException {
 
     // LocalDate startDate=trade.getPurchaseDate();
     //  if(!isValidDates(from, to))
