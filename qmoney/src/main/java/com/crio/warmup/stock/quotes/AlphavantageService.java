@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
+import javax.management.RuntimeErrorException;
 import org.springframework.web.client.RestTemplate;
 
 public class AlphavantageService implements StockQuotesService {
@@ -72,18 +73,30 @@ public List<Candle> getStockQuote(String symbol, LocalDate from, LocalDate to)
       String url=buildUri(symbol, from,to);
     // System.out.println(url);
      
-     AlphavantageDailyResponse data=null;
-     
+    
+     String response="";
      try{
-     data=restTemplate.getForObject(url,  AlphavantageDailyResponse.class);
-     }catch(NullPointerException e){
-      throw new StockQuoteServiceException(e.getMessage());
-     }catch(Exception e){
-      throw new StockQuoteServiceException(e.getMessage());
+     response=restTemplate.getForObject(url, String.class);
+      }catch(NullPointerException e){
+        System.out.println(e.getMessage());
+       throw new StockQuoteServiceException(e.getMessage());
+      }catch(RuntimeException e){
+        System.out.println(e.getMessage());
+       throw new StockQuoteServiceException(e.getMessage());
+      }
+     
+      ObjectMapper objectMapper=new ObjectMapper();
+      objectMapper.registerModule(new JavaTimeModule());
+     
+     
+      AlphavantageDailyResponse data=objectMapper.readValue(response,  AlphavantageDailyResponse.class);
+      Map<LocalDate, AlphavantageCandle> candles=data.getCandles();
+      
+     if(candles==null){
+      throw new StockQuoteServiceException(new RuntimeException().getMessage());
      }
-     Map<LocalDate, AlphavantageCandle> candles=data.getCandles();
-
      List<Candle> candlesList=new ArrayList<>();
+    
      for( Map.Entry<LocalDate, AlphavantageCandle> entry: candles.entrySet()){
       if(entry.getKey().isAfter(from) && entry.getKey().isBefore(to)){
          entry.getValue().setDate(entry.getKey());

@@ -53,9 +53,13 @@ public class TiingoService implements StockQuotesService {
      ObjectMapper objectMapper=new ObjectMapper();
      objectMapper.registerModule(new JavaTimeModule());
      TiingoCandle[] tiingoCandleArray=objectMapper.readValue(json, TiingoCandle[].class);
+
+    //  if(candles==null){
+    //   throw new StockQuoteServiceException(new RuntimeException().getMessage());
+    //  }
      
      if(tiingoCandleArray==null){
-      return new ArrayList<>();
+      throw new StockQuoteServiceException(new RuntimeException().getMessage());
      }
 
       List<Candle> candlesList=Arrays.asList(tiingoCandleArray);
