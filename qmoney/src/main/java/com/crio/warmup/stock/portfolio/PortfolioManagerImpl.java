@@ -1,40 +1,41 @@
 
 package com.crio.warmup.stock.portfolio;
 
-import static java.time.temporal.ChronoUnit.DAYS;
-import static java.time.temporal.ChronoUnit.SECONDS;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import com.crio.warmup.stock.PortfolioManagerApplication;
+// import static java.time.temporal.ChronoUnit.DAYS;
+// import static java.time.temporal.ChronoUnit.SECONDS;
+// import java.io.IOException;
+// import java.net.URISyntaxException;
+// import com.crio.warmup.stock.PortfolioManagerApplication;
 import com.crio.warmup.stock.dto.AnnualizedReturn;
 import com.crio.warmup.stock.dto.Candle;
 import com.crio.warmup.stock.dto.PortfolioTrade;
-import com.crio.warmup.stock.dto.TiingoCandle;
+//import com.crio.warmup.stock.dto.TiingoCandle;
 import com.crio.warmup.stock.exception.StockQuoteServiceException;
 import com.crio.warmup.stock.quotes.StockQuotesService;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+//import com.fasterxml.jackson.databind.ObjectMapper;
+//import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Arrays;
+//import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
+// import java.util.concurrent.TimeUnit;
+// import java.util.stream.Collectors;
 import org.springframework.web.client.RestTemplate;
 
 public class PortfolioManagerImpl implements PortfolioManager {
 
   
 
-  private static String token="076d21137d5269064524cd8effa18fbdcdd9d86a";
+  private static String token="99601c555207476b4459e78e9f8338ddae96c21e";
    
   private RestTemplate restTemplate;
 
@@ -79,7 +80,8 @@ public class PortfolioManagerImpl implements PortfolioManager {
          annualizedReturns.add(ans);
           } catch (JsonProcessingException e) {
             // TODO Auto-generated catch block
-            throw new StockQuoteServiceException(e.getMessage());
+            // throw new StockQuoteServiceException(e.getMessage());
+            e.printStackTrace();
             
           }
         }
@@ -158,17 +160,69 @@ public class PortfolioManagerImpl implements PortfolioManager {
 
  
 
+    public List<AnnualizedReturn> calculateAnnualizedReturnParallel(
+    List<PortfolioTrade> portfolioTrades,
+    LocalDate endDate, int numThreads) throws InterruptedException,
+    StockQuoteServiceException{
+ /////////
+    List<AnnualizedReturn> annualizedReturns=new ArrayList<>();
+      ExecutorService service=Executors.newFixedThreadPool(numThreads); 
+      List<Future<AnnualizedReturn>> futures=new ArrayList<>();    
+            
+      for(PortfolioTrade trade:portfolioTrades){
+     MyCallable myCallable=new MyCallable(trade, endDate);
+      Future<AnnualizedReturn> f=service.submit(myCallable);
+      futures.add(f);
+     }
+
+     for(int i=0; i<futures.size(); i++){
+      try{
+       annualizedReturns.add(futures.get(i).get());
+      }catch(ExecutionException e){
+      throw  new StockQuoteServiceException(e.getMessage());
+      }
+     }
+      service.shutdown();
+     Collections.sort(annualizedReturns,getComparator());
+      return annualizedReturns;
+ /////////
+    }
+
+    public AnnualizedReturn calculateAnnualizedReturnParallelHelper(PortfolioTrade trade,
+    LocalDate endDate) throws StockQuoteServiceException{
+      List<Candle> candlesList;
+      try {
+      candlesList = getStockQuote(trade.getSymbol(),trade.getPurchaseDate(),endDate);
+        Double buyPrice=getOpeningPriceOnStartDate(candlesList);
+         Double sellPrice=getClosingPriceOnEndDate(candlesList);
+       AnnualizedReturn ans=calculateAnnualizedReturns(endDate, trade, buyPrice, sellPrice);
+       return ans;
+      } catch (JsonProcessingException e) {
+        // TODO Auto-generated catch block
+        throw new StockQuoteServiceException(e.getMessage());
+        
+      }
+    }
 
 
 
 
 
+ class MyCallable implements Callable<AnnualizedReturn> {
 
-  // private Comparator<AnnualizedReturn> getComparator() {
-  //   return Comparator.comparing(AnnualizedReturn::getAnnualizedReturn).reversed();
-  // }
+  PortfolioTrade trade;
+  LocalDate endDate;
+  MyCallable(PortfolioTrade trade,LocalDate endDate){
+    this.trade=trade;
+    this.endDate=endDate;
+  }
+ 
+      public AnnualizedReturn call() throws StockQuoteServiceException{
+
+        AnnualizedReturn ans=calculateAnnualizedReturnParallelHelper(trade,endDate);
+        return ans;
+      }
 
 
-
-
-}
+    }
+  }

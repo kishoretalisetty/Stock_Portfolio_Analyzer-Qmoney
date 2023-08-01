@@ -17,13 +17,9 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Comparator;
-import java.util.List;
 import java.util.stream.Collectors;
-import javax.management.RuntimeErrorException;
 import org.springframework.web.client.RestTemplate;
 
 public class AlphavantageService implements StockQuotesService {

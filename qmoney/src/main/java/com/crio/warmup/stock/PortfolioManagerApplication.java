@@ -18,37 +18,37 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Collections;
+//import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+//import java.util.stream.Collectors;
+//import java.util.stream.Stream;
 import org.apache.logging.log4j.ThreadContext;
 import org.springframework.web.client.RestTemplate;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
-import java.util.UUID;
-import java.util.logging.Logger;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import org.apache.logging.log4j.ThreadContext;
-import org.springframework.web.client.RestTemplate;
-import java.util.List;
+// import java.nio.file.Paths;
+// import java.time.LocalDate;
+// import java.time.temporal.ChronoUnit;
+// import java.util.Arrays;
+// import java.util.Comparator;
+// import java.util.List;
+// import java.util.UUID;
+// import java.util.logging.Logger;
+// import java.util.stream.Collectors;
+// import java.util.stream.Stream;
+// import org.apache.logging.log4j.ThreadContext;
+// import org.springframework.web.client.RestTemplate;
+//import java.util.List;
 
 public class PortfolioManagerApplication {
      
     // private static String token="99601c555207476b4459e78e9f8338ddae96c21e";
     
-    private static String token="076d21137d5269064524cd8effa18fbdcdd9d86a";
+    private static String token="99601c555207476b4459e78e9f8338ddae96c21e";
 
   // TODO: CRIO_TASK_MODULE_JSON_PARSING
   //  Task:
