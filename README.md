@@ -1,6 +1,7 @@
 # QMoney
 
-SKILLS:- Multithreading, Exception Handling, Design Patterns, Gradle, Code Refactoring, Unit testing, HTTP, Java, REST, Jackson
+Languages :- Java
+Technologies/Frameworks :- Multithreading, Exception Handling, Design Patterns, Gradle, Code Refactoring, Unit testing, HTTP, REST, Jackson
 
 QMoney is a visual stock portfolio analyzer. It helps portfolio managers make trade recommendations for their clients.
 During the course of this project,
