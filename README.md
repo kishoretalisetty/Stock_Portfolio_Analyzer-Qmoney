@@ -1,8 +1,8 @@
 # QMoney
 
-Languages :- Java
+**Languages** :- Java
 
-Technologies/Frameworks :- Multithreading, Exception Handling, Design Patterns, Gradle, Code Refactoring, Unit testing, HTTP, REST, Jackson
+**Technologies/Frameworks** :- Multithreading, Exception Handling, Design Patterns, Gradle, Code Refactoring, Unit testing, HTTP, REST, Jackson
 
 QMoney is a visual stock portfolio analyzer. It helps portfolio managers make trade recommendations for their clients.
 During the course of this project,
@@ -12,4 +12,4 @@ During the course of this project,
 4) Improved application responsiveness by introducing multithreading.
 5) Wrote unit tests to measure performance improvements.
 
-Link:-https://www.crio.do/learn/portfolio/kishorethalisetty/ME_QMONEY_V2/?edit=true
+[Project Link](https://www.crio.do/learn/portfolio/kishorethalisetty/ME_QMONEY_V2/?edit=true)
