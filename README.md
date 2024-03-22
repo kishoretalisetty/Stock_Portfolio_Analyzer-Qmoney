@@ -1,6 +1,6 @@
 # QMoney
 
-QMoney is a visual stock portfolio analyzer. It helps portfolio managers make trade recommendations for their clients.
+QMoney is a Java application for managing stock portfolios, calculating annualized returns, and fetching stock data from external APIs.
 
 ## Overview
 
